@@ -71,8 +71,8 @@ public class GamesController {
         game.setAllowedModalities(
                 allowedModalities != null
                         ? allowedModalities.stream()
-                            .map(Tournament.Modality::valueOf)
-                            .collect(Collectors.toList())
+                                .map(Tournament.Modality::valueOf)
+                                .collect(Collectors.toList())
                         : List.of()
         );
 
@@ -86,8 +86,8 @@ public class GamesController {
 
     @GetMapping("/{id}/edit")
     public String showEditGame(@PathVariable Long id,
-                               Model model,
-                               RedirectAttributes redirectAttributes) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
 
         Game game = gameRepository.findById(id).orElse(null);
 
@@ -97,6 +97,7 @@ public class GamesController {
         }
 
         model.addAttribute("game", game);
+        model.addAttribute("modalities", Tournament.Modality.values());
         return "games/edit";
     }
 
@@ -108,7 +109,7 @@ public class GamesController {
             @RequestParam int playersPerTeam,
             @RequestParam int maxSubstitutesPerTeam,
             @RequestParam(required = false) List<String> allowedModalities,
-            @RequestParam List<Integer> allowedMaxParticipants,
+            @RequestParam(required = false) List<Integer> allowedMaxParticipants,
             RedirectAttributes redirectAttributes) {
 
         Game game = gameRepository.findById(id).orElse(null);
@@ -118,30 +119,52 @@ public class GamesController {
             return "redirect:/games";
         }
 
+        // Datos básicos
         game.setName(name);
         game.setSlug(slug);
-        game.setPlayersPerTeam(playersPerTeam);
-        game.setMaxSubstitutesPerTeam(maxSubstitutesPerTeam);
 
-        game.setAllowedModalities(
-                allowedModalities != null
-                        ? allowedModalities.stream()
-                            .map(Tournament.Modality::valueOf)
-                            .collect(Collectors.toList())
-                        : List.of()
-        );
+        // Modalidades (String -> Enum)
+        List<Tournament.Modality> modalities = (allowedModalities != null)
+                ? allowedModalities.stream()
+                        .map(Tournament.Modality::valueOf)
+                        .collect(Collectors.toList())
+                : List.of();
 
-        game.setAllowedMaxParticipants(allowedMaxParticipants);
+        game.setAllowedModalities(modalities);
+
+        // Lógica: si no hay TEAM, no tiene sentido guardar valores de equipo
+        if (modalities.contains(Tournament.Modality.TEAM)) {
+            game.setPlayersPerTeam(playersPerTeam);
+            game.setMaxSubstitutesPerTeam(maxSubstitutesPerTeam);
+        } else {
+            game.setPlayersPerTeam(0);
+            game.setMaxSubstitutesPerTeam(0);
+        }
+
+        // Participantes (evitar null + limpiar duplicados y negativos)
+        List<Integer> participants = (allowedMaxParticipants != null)
+                ? allowedMaxParticipants.stream()
+                        .filter(p -> p != null && p > 0)
+                        .distinct()
+                        .sorted()
+                        .collect(Collectors.toList())
+                : List.of();
+
+        game.setAllowedMaxParticipants(participants);
 
         gameRepository.save(game);
-        redirectAttributes.addFlashAttribute("success", "Juego \"" + name + "\" actualizado correctamente.");
+
+        redirectAttributes.addFlashAttribute(
+                "success",
+                "Juego \"" + name + "\" actualizado correctamente."
+        );
 
         return "redirect:/games";
     }
 
     @PostMapping("/{id}/delete")
     public String deleteGame(@PathVariable Long id,
-                             RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) {
 
         Game game = gameRepository.findById(id).orElse(null);
 
