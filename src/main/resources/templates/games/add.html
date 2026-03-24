@@ -64,7 +64,6 @@
                 </h5>
 
                 <form th:action="@{/games/add}" method="post">
-                    <!-- Campos ocultos del juego seleccionado -->
                     <input type="hidden" id="selectedName" name="name" />
                     <input type="hidden" id="selectedSlug" name="slug" />
 
@@ -80,35 +79,43 @@
 
                     <div class="row g-3">
 
-                        <!-- Modalidades permitidas
+                        <!-- Modalidades -->
                         <div class="col-12">
                             <label class="form-label text-white-50 small">🎮 Modalidades permitidas</label>
-
-                            <div th:if="${modalities != null}" th:each="mod : ${modalities}" class="form-check">
-                                <input class="form-check-input" type="checkbox" name="allowedModalities"
-                                    th:value="${mod}" th:id="${'mod_' + mod}" />
-
-                                <label class="form-check-label" th:for="${'mod_' + mod}" th:text="${mod}">
-                                </label>
+                            <div class="d-flex gap-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="allowedModalities"
+                                        value="INDIVIDUAL" id="mod_INDIVIDUAL" onchange="updateTeamFields()" />
+                                    <label class="form-check-label" for="mod_INDIVIDUAL">Individual</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="allowedModalities" value="DUO"
+                                        id="mod_DUO" onchange="updateTeamFields()" />
+                                    <label class="form-check-label" for="mod_DUO">Dúo</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="allowedModalities"
+                                        value="TEAM" id="mod_TEAM" onchange="updateTeamFields()" />
+                                    <label class="form-check-label" for="mod_TEAM">Equipo</label>
+                                </div>
                             </div>
-                        </div> -->
-
-                        <!-- Jugadores por equipo -->
-                        <div class="col-md-6">
-                            <label class="form-label text-white-50 small">👥 Jugadores por equipo</label>
-                            <input type="number" name="playersPerTeam" min="0" max="20" value="0"
-                                class="form-control bg-dark text-white border-secondary" />
-                            <div class="form-text text-white-50">Pon 0 si es individual</div>
                         </div>
 
-                        <!-- Suplentes por equipo -->
-                        <div class="col-md-6">
-                            <label class="form-label text-white-50 small">🔄 Máx. suplentes por equipo</label>
-                            <input type="number" name="maxSubstitutesPerTeam" min="0" max="10" value="0"
-                                class="form-control bg-dark text-white border-secondary" />
+                        <!-- Campos de equipo (solo visibles si TEAM está marcado) -->
+                        <div id="teamFields" class="col-12 row g-3" style="display:none;">
+                            <div class="col-md-6">
+                                <label class="form-label text-white-50 small">👥 Jugadores por equipo</label>
+                                <input type="number" name="playersPerTeam" id="playersPerTeam" min="1" max="20"
+                                    value="5" class="form-control bg-dark text-white border-secondary" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-white-50 small">🔄 Máx. suplentes por equipo</label>
+                                <input type="number" name="maxSubstitutesPerTeam" id="maxSubstitutesPerTeam" min="0"
+                                    max="10" value="0" class="form-control bg-dark text-white border-secondary" />
+                            </div>
                         </div>
 
-                        <!-- Máx. participantes permitidos -->
+                        <!-- Máx. participantes -->
                         <div class="col-12">
                             <label class="form-label text-white-50 small">
                                 🏆 Máx. participantes permitidos
@@ -117,7 +124,6 @@
                             <input type="text" id="participantsInput"
                                 class="form-control bg-dark text-white border-secondary" placeholder="Ej: 8, 16, 32" />
                             <div class="form-text text-white-50">Cada valor generará una opción al crear torneos</div>
-                            <!-- Se generan dinámicamente -->
                             <div id="participantsHidden"></div>
                         </div>
 
@@ -185,6 +191,18 @@
 
             document.getElementById('specsSection').style.display = 'block';
             document.getElementById('specsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateTeamFields() {
+            const teamChecked = document.getElementById('mod_TEAM').checked;
+            const teamFields = document.getElementById('teamFields');
+            teamFields.style.display = teamChecked ? 'flex' : 'none';
+
+            // Si se desmarca TEAM, resetea los valores
+            if (!teamChecked) {
+                document.getElementById('playersPerTeam').value = 5;
+                document.getElementById('maxSubstitutesPerTeam').value = 0;
+            }
         }
 
         function buildParticipants() {
