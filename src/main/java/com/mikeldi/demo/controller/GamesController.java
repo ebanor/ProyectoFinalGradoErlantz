@@ -1,0 +1,153 @@
+package com.mikeldi.demo.controller;
+
+import com.mikeldi.demo.entity.Game;
+import com.mikeldi.demo.entity.Tournament;
+import com.mikeldi.demo.repository.GameRepository;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.ui.Model;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Controller
+@RequestMapping("/games")
+public class GamesController {
+
+    private final GameRepository gameRepository;
+
+    public GamesController(GameRepository gameRepository) {
+        this.gameRepository = gameRepository;
+    }
+
+    // 👉 Esto hace que "modalities" esté disponible SIEMPRE en todas las vistas
+    @ModelAttribute("modalities")
+    public Tournament.Modality[] modalities() {
+        return Tournament.Modality.values();
+    }
+
+    @GetMapping("")
+    public String games(Model model) {
+        List<Game> games = gameRepository.findAll();
+        model.addAttribute("games", games);
+        return "games";
+    }
+
+    @GetMapping("/add")
+    public String showAddGame(Model model) {
+        model.addAttribute("game", new Game());
+        return "games/add";
+    }
+
+    @PostMapping("/add")
+    public String saveGame(
+            @RequestParam String name,
+            @RequestParam String slug,
+            @RequestParam int playersPerTeam,
+            @RequestParam int maxSubstitutesPerTeam,
+            @RequestParam(required = false) List<String> allowedModalities,
+            @RequestParam List<Integer> allowedMaxParticipants,
+            RedirectAttributes redirectAttributes) {
+
+        if (gameRepository.findByName(name).isPresent()) {
+            redirectAttributes.addFlashAttribute("error", "Ya existe un juego con ese nombre.");
+            return "redirect:/games/add";
+        }
+
+        Game game = new Game();
+        game.setName(name);
+        game.setSlug(slug);
+        game.setPlayersPerTeam(playersPerTeam);
+        game.setMaxSubstitutesPerTeam(maxSubstitutesPerTeam);
+
+        game.setAllowedModalities(
+                allowedModalities != null
+                        ? allowedModalities.stream()
+                            .map(Tournament.Modality::valueOf)
+                            .collect(Collectors.toList())
+                        : List.of()
+        );
+
+        game.setAllowedMaxParticipants(allowedMaxParticipants);
+
+        gameRepository.save(game);
+        redirectAttributes.addFlashAttribute("success", "Juego \"" + name + "\" añadido correctamente.");
+
+        return "redirect:/games";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String showEditGame(@PathVariable Long id,
+                               Model model,
+                               RedirectAttributes redirectAttributes) {
+
+        Game game = gameRepository.findById(id).orElse(null);
+
+        if (game == null) {
+            redirectAttributes.addFlashAttribute("error", "Juego no encontrado.");
+            return "redirect:/games";
+        }
+
+        model.addAttribute("game", game);
+        return "games/edit";
+    }
+
+    @PostMapping("/{id}/edit")
+    public String updateGame(
+            @PathVariable Long id,
+            @RequestParam String name,
+            @RequestParam String slug,
+            @RequestParam int playersPerTeam,
+            @RequestParam int maxSubstitutesPerTeam,
+            @RequestParam(required = false) List<String> allowedModalities,
+            @RequestParam List<Integer> allowedMaxParticipants,
+            RedirectAttributes redirectAttributes) {
+
+        Game game = gameRepository.findById(id).orElse(null);
+
+        if (game == null) {
+            redirectAttributes.addFlashAttribute("error", "Juego no encontrado.");
+            return "redirect:/games";
+        }
+
+        game.setName(name);
+        game.setSlug(slug);
+        game.setPlayersPerTeam(playersPerTeam);
+        game.setMaxSubstitutesPerTeam(maxSubstitutesPerTeam);
+
+        game.setAllowedModalities(
+                allowedModalities != null
+                        ? allowedModalities.stream()
+                            .map(Tournament.Modality::valueOf)
+                            .collect(Collectors.toList())
+                        : List.of()
+        );
+
+        game.setAllowedMaxParticipants(allowedMaxParticipants);
+
+        gameRepository.save(game);
+        redirectAttributes.addFlashAttribute("success", "Juego \"" + name + "\" actualizado correctamente.");
+
+        return "redirect:/games";
+    }
+
+    @PostMapping("/{id}/delete")
+    public String deleteGame(@PathVariable Long id,
+                             RedirectAttributes redirectAttributes) {
+
+        Game game = gameRepository.findById(id).orElse(null);
+
+        if (game == null) {
+            redirectAttributes.addFlashAttribute("error", "Juego no encontrado.");
+            return "redirect:/games";
+        }
+
+        String nombre = game.getName();
+        gameRepository.deleteById(id);
+
+        redirectAttributes.addFlashAttribute("success", "Juego \"" + nombre + "\" eliminado correctamente.");
+
+        return "redirect:/games";
+    }
+}

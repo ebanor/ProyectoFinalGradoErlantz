@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Juegos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+    <style>
+        .game-card:hover {
+            border-color: #ffc107 !important;
+            transform: scale(1.02);
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .game-card { transition: 0.2s; }
+        #modalBanner {
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .rating-bar {
+            height: 8px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-dark text-white">
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container mt-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">🎮 Juegos disponibles</h2>
+            <p class="text-muted mb-0">Haz click en un juego para ver su información</p>
+        </div>
+        <a href="/games/add" class="btn btn-warning text-dark fw-bold"
+           sec:authorize="hasRole('ADMIN')">
+            <i class="bi bi-plus-circle"></i> Añadir juego
+        </a>
+    </div>
+
+    <!-- Alertas flash -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-3" th:each="game : ${games}">
+            <div class="card bg-dark text-white border-secondary h-100 game-card">
+
+                <!-- Zona clickable para el modal -->
+                <div class="p-3"
+                     th:attr="data-slug=${game.slug}"
+                     onclick="loadGameInfo(this.dataset.slug, this.querySelector('h5').innerText)"
+                     data-bs-toggle="modal"
+                     data-bs-target="#gameModal">
+                    <i class="bi bi-controller fs-2 text-warning"></i>
+                    <h5 class="mt-2" th:text="${game.name}"></h5>
+                    <p class="text-muted small mb-0">Ver detalles</p>
+                </div>
+
+                <!-- Botones editar/eliminar solo para ADMIN -->
+                <div class="card-footer border-secondary d-flex justify-content-end gap-2 py-2"
+                     sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/games/{id}/edit(id=${game.id})}"
+                       class="btn btn-outline-warning btn-sm"
+                       onclick="event.stopPropagation()">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <form th:action="@{/games/{id}/delete(id=${game.id})}" method="post"
+                          onclick="event.stopPropagation()"
+                          onsubmit="return confirm('¿Eliminar ' + /*[[${game.name}]]*/ '' + '?')">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal info RAWG -->
+<div class="modal fade" id="gameModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-warning" id="modalTitle">Cargando...</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-warning" role="status"></div>
+                    <p class="mt-2 text-muted">Obteniendo información...</p>
+                </div>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function loadGameInfo(slug, name) {
+        document.getElementById('modalTitle').innerText = name;
+        document.getElementById('modalBody').innerHTML = `
+            <div class="text-center py-4">
+                <div class="spinner-border text-warning" role="status"></div>
+                <p class="mt-2 text-muted">Obteniendo información...</p>
+            </div>`;
+
+        fetch('/api/games/' + slug)
+            .then(res => res.json())
+            .then(data => {
+                const rating     = data.rating     ? data.rating.toFixed(1)             : 'N/A';
+                const ratingPct  = data.rating     ? (data.rating / 5 * 100).toFixed(0) : 0;
+                const released   = data.released   || 'Desconocido';
+                const metacritic = data.metacritic || 'N/A';
+                const genres     = data.genres     ? data.genres.map(g => g.name).join(', ')             : 'N/A';
+                const platforms  = data.platforms  ? data.platforms.map(p => p.platform.name).join(', '): 'N/A';
+                const developers = data.developers ? data.developers.map(d => d.name).join(', ')        : 'N/A';
+                const publishers = data.publishers ? data.publishers.map(p => p.name).join(', ')        : 'N/A';
+                const desc       = data.description_raw
+                    ? data.description_raw.substring(0, 400) + '...'
+                    : 'Sin descripción disponible.';
+                const img        = data.background_image || '';
+
+                document.getElementById('modalBody').innerHTML = `
+                    ${img ? `<img id="modalBanner" src="${img}" alt="${name}" class="mb-3"/>` : ''}
+                    <div class="row g-3 mb-3 text-center">
+                        <div class="col-6 col-md-4">
+                            <div class="text-white-50 small">⭐ Rating</div>
+                            <div class="fw-bold text-warning fs-5">${rating} / 5</div>
+                            <div class="progress mt-1 rating-bar">
+                                <div class="progress-bar bg-warning" style="width:${ratingPct}%"></div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <div class="text-white-50 small">🎮 Metacritic</div>
+                            <div class="fw-bold fs-5">${metacritic}</div>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <div class="text-white-50 small">📅 Lanzamiento</div>
+                            <div class="fw-bold">${released}</div>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <span class="text-white-50 small">🎯 Géneros: </span>
+                            <span class="small">${genres}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-white-50 small">🖥️ Plataformas: </span>
+                            <span class="small">${platforms}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-white-50 small">🛠️ Desarrolladores: </span>
+                            <span class="small">${developers}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-white-50 small">📦 Distribuidores: </span>
+                            <span class="small">${publishers}</span>
+                        </div>
+                    </div>
+                    <p class="text-light small border-top border-secondary pt-3">${desc}</p>
+                    ${data.website ? `<a href="${data.website}" target="_blank" class="btn btn-outline-warning btn-sm">🌐 Sitio oficial</a>` : ''}
+                `;
+            })
+            .catch(() => {
+                document.getElementById('modalBody').innerHTML =
+                    '<p class="text-danger text-center py-3">❌ No se pudo obtener la información del juego.</p>';
+            });
+    }
+</script>
+</body>
+</html>

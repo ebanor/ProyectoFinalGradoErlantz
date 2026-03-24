@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<nav th:fragment="navbar" class="navbar navbar-dark bg-black px-4 py-3">
+    <a class="navbar-brand fw-bold fs-4 text-decoration-none" href="/home">
+        <i class="bi bi-trophy-fill text-warning"></i> Tournament Platform
+    </a>
+    <div class="d-flex align-items-center gap-3">
+
+        <a href="/tournaments" class="btn btn-outline-light btn-sm position-relative">
+            <i class="bi bi-calendar-event"></i> Torneos
+            <span th:if="${notifDuos != null and notifDuos > 0}"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark"
+                  th:text="${notifDuos}"></span>
+        </a>
+
+        <a href="/teams" class="btn btn-outline-light btn-sm position-relative">
+            <i class="bi bi-shield-fill"></i> Equipos
+            <span th:if="${notifTeams > 0}"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark"
+                  th:text="${notifTeams}"></span>
+        </a>
+
+        <a href="/friends" class="btn btn-outline-light btn-sm position-relative">
+            <i class="bi bi-people-fill"></i> Amigos
+            <span th:if="${notifFriends > 0}"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark"
+                  th:text="${notifFriends}"></span>
+        </a>
+		
+		<a href="/admin" class="btn btn-outline-warning btn-sm"
+		   sec:authorize="hasRole('ADMIN')">
+		    <i class="bi bi-gear-fill"></i> Admin
+		</a>
+
+        <a href="/profile" class="text-light small text-decoration-none">
+            <i class="bi bi-person-circle"></i>
+            <sec:authentication property="name" />
+        </a>
+
+        <form th:action="@{/logout}" method="post" class="m-0">
+            <button type="submit" class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-box-arrow-right"></i> Salir
+            </button>
+        </form>
+    </div>
+</nav>
+</body>
+</html>

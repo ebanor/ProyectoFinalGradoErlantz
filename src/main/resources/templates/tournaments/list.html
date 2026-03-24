@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Torneos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+</head>
+<body class="bg-dark text-white">
+
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-calendar-event text-warning"></i> Torneos disponibles</h2>
+        <a href="/tournaments/new" class="btn btn-warning text-dark fw-bold"
+           sec:authorize="hasRole('ORGANIZER') or hasRole('ADMIN')">
+            <i class="bi bi-plus-circle"></i> Crear torneo
+        </a>
+    </div>
+
+    <div th:if="${tournaments.empty}" class="alert alert-secondary">
+        No hay torneos disponibles todavía.
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4" th:each="t : ${tournaments}">
+            <div class="card bg-secondary text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${t.name}"></h5>
+                    <p class="card-text text-warning mb-1">
+                        <i class="bi bi-controller"></i> <span th:text="${t.game.name}"></span>
+                    </p>
+                    <p class="card-text mb-1">
+                        <i class="bi bi-people-fill"></i> Max: <span th:text="${t.maxParticipants}"></span>
+                    </p>
+                    <p class="card-text mb-1">
+                        <span class="badge bg-success"           th:if="${t.status.name() == 'OPEN'}">Abierto</span>
+                        <span class="badge bg-secondary"         th:if="${t.status.name() == 'CLOSED'}">Cerrado</span>
+                        <span class="badge bg-warning text-dark" th:if="${t.status.name() == 'IN_PROGRESS'}">En curso</span>
+                        <span class="badge bg-secondary"         th:if="${t.status.name() == 'FINISHED'}">Finalizado</span>
+                    </p>
+                    <p class="card-text mb-2">
+                        <span class="badge bg-info text-dark" th:if="${t.modality.name() == 'INDIVIDUAL'}">Individual</span>
+                        <span class="badge bg-info text-dark" th:if="${t.modality.name() == 'DUO'}">Duos</span>
+                        <span class="badge bg-primary"        th:if="${t.modality.name() == 'TEAM'}">Por equipos</span>
+                    </p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a th:href="@{/tournaments/{id}(id=${t.id})}" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-eye"></i> Ver detalle
+                    </a>
+                    <form th:action="@{/tournaments/{id}/delete(id=${t.id})}" method="post"
+                          sec:authorize="hasRole('ORGANIZER') or hasRole('ADMIN')">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

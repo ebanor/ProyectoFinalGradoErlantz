@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+    <style>
+        .menu-card:hover { border-color: #ffc107 !important; transform: scale(1.02); transition: 0.2s; }
+        .menu-card { transition: 0.2s; cursor: pointer; }
+    </style>
+</head>
+<body class="bg-dark text-white">
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container mt-5">
+    <div class="p-5 rounded-3 bg-secondary text-center shadow">
+        <h1 class="fw-bold">
+            Bienvenido, <span class="text-warning" th:text="${username}"></span> 🏆
+        </h1>
+        <p class="text-light mt-3 fs-5">¿Qué quieres hacer hoy?</p>
+        <hr class="border-light"/>
+        <div class="row mt-4 g-3 justify-content-center">
+
+            <div class="col-md-3">
+                <a href="/tournaments" class="text-decoration-none text-white">
+                    <div class="card bg-dark text-white p-3 border-secondary menu-card">
+                        <i class="bi bi-calendar-event fs-2 text-warning"></i>
+                        <h5 class="mt-2">Torneos</h5>
+                        <p class="text-muted small">Ver torneos disponibles</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-3 position-relative">
+                <a href="/friends" class="text-decoration-none text-white">
+                    <div class="card bg-dark text-white p-3 border-secondary menu-card">
+                        <i class="bi bi-people-fill fs-2 text-warning"></i>
+                        <h5 class="mt-2">
+                            Amigos
+                            <span th:if="${notifFriends > 0}"
+                                  class="badge bg-warning text-dark ms-1"
+                                  th:text="${notifFriends}"></span>
+                        </h5>
+                        <p class="text-muted small">Ver y añadir amigos</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-3 position-relative">
+                <a href="/teams" class="text-decoration-none text-white">
+                    <div class="card bg-dark text-white p-3 border-secondary menu-card">
+                        <i class="bi bi-shield-fill fs-2 text-warning"></i>
+                        <h5 class="mt-2">
+                            Equipos
+                            <span th:if="${notifTeams > 0}"
+                                  class="badge bg-warning text-dark ms-1"
+                                  th:text="${notifTeams}"></span>
+                        </h5>
+                        <p class="text-muted small">Ver y gestionar equipos</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-3">
+                <a href="/stats" class="text-decoration-none text-white">
+                    <div class="card bg-dark text-white p-3 border-secondary menu-card">
+                        <i class="bi bi-bar-chart-fill fs-2 text-warning"></i>
+                        <h5 class="mt-2">Estadísticas</h5>
+                        <p class="text-muted small">Ver mis estadísticas</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- NUEVA CARD: Juegos -->
+            <div class="col-md-3">
+                <a href="/games" class="text-decoration-none text-white">
+                    <div class="card bg-dark text-white p-3 border-secondary menu-card">
+                        <i class="bi bi-controller fs-2 text-warning"></i>
+                        <h5 class="mt-2">Juegos</h5>
+                        <p class="text-muted small">Ver juegos disponibles</p>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

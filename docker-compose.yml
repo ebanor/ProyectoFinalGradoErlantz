@@ -1,0 +1,48 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: tournament-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: tournament_db
+      MYSQL_USER: tournament
+      MYSQL_PASSWORD: tournament
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: tournament-phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: tournament
+      PMA_PASSWORD: tournament
+    ports:
+      - "8082:80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  app:
+    build: .
+    container_name: tournament-app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/tournament_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: tournament
+      SPRING_DATASOURCE_PASSWORD: tournament
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+volumes:
+  mysql-data:

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Equipos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+</head>
+<body class="bg-dark text-white">
+
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="container mt-4">
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}"   class="alert alert-danger"  th:text="${error}"></div>
+
+    <!-- Invitaciones pendientes -->
+    <div th:if="${pendingInvitations != null and !pendingInvitations.empty}" class="mb-4">
+        <h5><i class="bi bi-envelope-fill text-warning"></i>
+            Invitaciones de equipo pendientes
+            <span class="badge bg-warning text-dark ms-1" th:text="${pendingInvitations.size()}"></span>
+        </h5>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item bg-dark text-white d-flex justify-content-between align-items-center"
+                th:each="inv : ${pendingInvitations}">
+                <span>
+                    <i class="bi bi-people-fill text-warning"></i>
+                    <strong th:text="${inv.team.name}"></strong>
+                    — invitado por <strong th:text="${inv.team.captain.username}"></strong>
+                </span>
+                <div class="d-flex gap-2">
+                    <form th:action="@{/teams/invite/accept/{id}(id=${inv.id})}" method="post">
+                        <button class="btn btn-success btn-sm"><i class="bi bi-check-lg"></i> Aceptar</button>
+                    </form>
+                    <form th:action="@{/teams/invite/reject/{id}(id=${inv.id})}" method="post">
+                        <button class="btn btn-outline-danger btn-sm"><i class="bi bi-x-lg"></i> Rechazar</button>
+                    </form>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="text-warning mb-0"><i class="bi bi-shield-fill"></i> Equipos</h4>
+        <a href="/teams/new" class="btn btn-warning btn-sm" sec:authorize="isAuthenticated()">
+            <i class="bi bi-plus-circle"></i> Crear equipo
+        </a>
+    </div>
+
+    <div th:if="${teams.empty}" class="text-muted">No hay equipos todavía.</div>
+    <div class="row row-cols-1 row-cols-md-3 g-3">
+        <div class="col" th:each="t : ${teams}">
+            <div class="card bg-secondary text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-warning" th:text="${t.name}"></h5>
+                    <p class="card-text small">
+                        <i class="bi bi-person-fill"></i> Capitán: <span th:text="${t.captain.username}"></span>
+                    </p>
+                    <a th:href="@{/teams/{id}(id=${t.id})}" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-eye"></i> Ver equipo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
