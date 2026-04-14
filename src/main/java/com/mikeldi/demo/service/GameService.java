@@ -23,41 +23,6 @@ public class GameService {
             .orElseThrow(() -> new RuntimeException("Juego no encontrado"));
     }
 
-    @PostConstruct
-    public void seedGames() {
-        upsert("League of Legends",
-            List.of(Tournament.Modality.TEAM),
-            List.of(4, 8, 16, 32), 3, 5);
-
-        upsert("Valorant",
-            List.of(Tournament.Modality.INDIVIDUAL, Tournament.Modality.TEAM),
-            List.of(4, 8, 16, 32, 64), 1, 5);
-
-        upsert("Fortnite",
-            List.of(Tournament.Modality.INDIVIDUAL, Tournament.Modality.DUO, Tournament.Modality.TEAM),
-            List.of(16, 32, 64, 100, 128, 256), 3, 4);
-
-        upsert("Counter-Strike 2",
-            List.of(Tournament.Modality.TEAM),
-            List.of(4, 8, 16, 32), 5, 5);
-
-        upsert("FIFA 25",
-            List.of(Tournament.Modality.INDIVIDUAL, Tournament.Modality.DUO),
-            List.of(8, 16, 32, 64, 128), 0, 0);
-
-        upsert("Rocket League",
-            List.of(Tournament.Modality.INDIVIDUAL, Tournament.Modality.DUO, Tournament.Modality.TEAM),
-            List.of(4, 8, 16, 32, 64), 2, 3);
-
-        upsert("Chess",
-            List.of(Tournament.Modality.INDIVIDUAL),
-            List.of(8, 16, 32, 64, 128), 0, 0);
-
-        upsert("Clash Royale",
-            List.of(Tournament.Modality.INDIVIDUAL, Tournament.Modality.DUO),
-            List.of(8, 16, 32, 64, 128), 0, 0);
-    }
-
     @Transactional
     public void upsert(String name, List<Tournament.Modality> modalities,
                        List<Integer> maxParticipants, int maxSubs, int playersPerTeam) {

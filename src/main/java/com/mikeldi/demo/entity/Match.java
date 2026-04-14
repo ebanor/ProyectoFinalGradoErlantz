@@ -1,5 +1,8 @@
 package com.mikeldi.demo.entity;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -12,6 +15,7 @@ public class Match {
 
     @ManyToOne
     @JoinColumn(name = "tournament_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Tournament tournament;
 
     private int round; // 1 = primera ronda, 2 = cuartos, etc.

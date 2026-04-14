@@ -1,6 +1,8 @@
 package com.mikeldi.demo.entity;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +31,9 @@ public class Game {
     @OrderColumn(name = "idx")
     @Column(name = "value")
     private List<Integer> allowedMaxParticipants;
+    
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Tournament> tournaments = new ArrayList<>();
 
     private int maxSubstitutesPerTeam;
 

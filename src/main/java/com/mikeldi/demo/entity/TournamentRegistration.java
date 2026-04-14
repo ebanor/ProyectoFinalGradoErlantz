@@ -3,6 +3,9 @@ package com.mikeldi.demo.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 @Entity
 @Table(name = "tournament_registrations")
 public class TournamentRegistration {
@@ -13,6 +16,7 @@ public class TournamentRegistration {
 
     @ManyToOne
     @JoinColumn(name = "tournament_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Tournament tournament;
 
     @ManyToOne

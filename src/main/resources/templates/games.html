@@ -76,13 +76,14 @@
                        onclick="event.stopPropagation()">
                         <i class="bi bi-pencil"></i>
                     </a>
-                    <form th:action="@{/games/{id}/delete(id=${game.id})}" method="post"
-                          onclick="event.stopPropagation()"
-                          onsubmit="return confirm('¿Eliminar ' + /*[[${game.name}]]*/ '' + '?')">
-                        <button type="submit" class="btn btn-outline-danger btn-sm">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </form>
+					<form th:action="@{/games/{id}/delete(id=${game.id})}" method="post"
+					      onclick="event.stopPropagation()"
+					      th:data-game-name="${game.name}"
+					      onsubmit="return confirmDelete(this)">
+					    <button type="submit" class="btn btn-outline-danger btn-sm">
+					        <i class="bi bi-trash"></i>
+					    </button>
+					</form>
                 </div>
 
             </div>
@@ -183,6 +184,12 @@
                     '<p class="text-danger text-center py-3">❌ No se pudo obtener la información del juego.</p>';
             });
     }
+	
+	function confirmDelete(form) {
+	    const name = form.getAttribute('data-game-name');
+	    return confirm('¿Eliminar el juego "' + name + '"? Esta acción no se puede deshacer.');
+	}
+
 </script>
 </body>
 </html>

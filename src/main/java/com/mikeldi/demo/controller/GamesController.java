@@ -113,8 +113,8 @@ public class GamesController {
             @PathVariable Long id,
             @RequestParam String name,
             @RequestParam String slug,
-            @RequestParam int playersPerTeam,
-            @RequestParam int maxSubstitutesPerTeam,
+            @RequestParam(defaultValue = "0") int playersPerTeam,
+            @RequestParam(defaultValue = "0") int maxSubstitutesPerTeam,
             @RequestParam(required = false) List<String> allowedModalities,
             @RequestParam(required = false) List<Integer> allowedMaxParticipants,
             RedirectAttributes redirectAttributes) {
