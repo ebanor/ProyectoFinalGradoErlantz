@@ -1,6 +1,7 @@
 package com.mikeldi.demo.controller;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
@@ -85,19 +86,25 @@ public class GamesController {
     }
 
     @GetMapping("/{id}/edit")
-    public String showEditGame(@PathVariable Long id,
-            Model model,
-            RedirectAttributes redirectAttributes) {
+    public String showEditGame(@PathVariable Long id, Model model,
+                               RedirectAttributes redirectAttributes) {
 
         Game game = gameRepository.findById(id).orElse(null);
-
         if (game == null) {
             redirectAttributes.addFlashAttribute("error", "Juego no encontrado.");
             return "redirect:/games";
         }
 
         model.addAttribute("game", game);
-        model.addAttribute("modalities", Tournament.Modality.values());
+
+        // ← Pasa las modalidades activas como Set<String> para comparar en la vista
+        Set<String> activeModalities = game.getAllowedModalities() != null
+            ? game.getAllowedModalities().stream()
+                  .map(Enum::name)
+                  .collect(Collectors.toSet())
+            : Set.of();
+
+        model.addAttribute("activeModalities", activeModalities);
         return "games/edit";
     }
 

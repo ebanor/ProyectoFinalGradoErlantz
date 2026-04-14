@@ -33,6 +33,11 @@
 		   sec:authorize="hasRole('ADMIN')">
 		    <i class="bi bi-gear-fill"></i> Admin
 		</a>
+		
+		<a href="/games" class="btn btn-outline-warning btn-sm"
+      		sec:authorize="hasRole('ADMIN')">
+            <i class="bi bi-controller"></i> Juegos
+        </a>
 
         <a href="/profile" class="text-light small text-decoration-none">
             <i class="bi bi-person-circle"></i>
