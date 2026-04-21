@@ -6,6 +6,162 @@
     <title>Detalle Torneo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+	
+	<style>
+	/* ══════════════════════════════════════
+	   BRACKET VISUAL
+	══════════════════════════════════════ */
+	.bracket-scroll {
+	    overflow-x: auto;
+	    padding-bottom: 1rem;
+	}
+
+	.bracket-container {
+	    display: flex;
+	    align-items: center;
+	    gap: 0;
+	    min-width: max-content;
+	    padding: 1.5rem 0.5rem;
+	}
+
+	/* ── Ronda (columna) ── */
+	.bracket-round {
+	    display: flex;
+	    flex-direction: column;
+	    align-items: center;
+	    min-width: 180px;
+	}
+
+	.bracket-round-title {
+	    font-size: 0.75rem;
+	    font-weight: 700;
+	    text-transform: uppercase;
+	    letter-spacing: 0.08em;
+	    color: #ffc107;
+	    margin-bottom: 0.75rem;
+	    text-align: center;
+	}
+
+	/* ── Lista de matches de una ronda ── */
+	.bracket-match-list {
+	    display: flex;
+	    flex-direction: column;
+	    justify-content: space-around;
+	    flex: 1;
+	    width: 100%;
+	    gap: 0;
+	}
+
+	/* ── Wrapper: match + conector derecho ── */
+	.bracket-match-wrapper {
+	    display: flex;
+	    flex-direction: column;
+	    align-items: flex-start;
+	    position: relative;
+	    padding: 12px 0;
+	}
+
+	/* ── Tarjeta del partido ── */
+	.bracket-match {
+	    background: #1e2a3a;
+	    border: 1px solid #374151;
+	    border-radius: 8px;
+	    width: 165px;
+	    overflow: hidden;
+	    transition: border-color 0.2s;
+	}
+
+	.bracket-match.finished {
+	    border-color: #374151;
+	}
+
+	.bracket-match:hover {
+	    border-color: #ffc107;
+	}
+
+	/* ── Fila de equipo/jugador ── */
+	.bracket-team {
+	    display: flex;
+	    align-items: center;
+	    gap: 0.4rem;
+	    padding: 0.45rem 0.65rem;
+	    font-size: 0.82rem;
+	    color: #cbd5e1;
+	    background: transparent;
+	    transition: background 0.15s;
+	    white-space: nowrap;
+	    overflow: hidden;
+	    text-overflow: ellipsis;
+	    max-width: 165px;
+	}
+
+	.bracket-team.winner {
+	    background: rgba(34, 197, 94, 0.15);
+	    color: #4ade80;
+	    font-weight: 700;
+	}
+
+	.bracket-team.winner i {
+	    color: #fbbf24;
+	}
+
+	/* ── Separador entre los dos equipos ── */
+	.bracket-divider {
+	    height: 1px;
+	    background: #374151;
+	    margin: 0;
+	}
+
+	/* ── Campeón ── */
+	.bracket-champion .bracket-match {
+	    border-color: #ffc107;
+	    background: #1a1f0a;
+	}
+
+	.champion-card {
+	    border: 2px solid #ffc107 !important;
+	    box-shadow: 0 0 16px rgba(255, 193, 7, 0.3);
+	}
+
+	.champion-team {
+	    font-size: 0.95rem;
+	    padding: 0.75rem 0.65rem;
+	    justify-content: center;
+	    color: #ffc107 !important;
+	    background: transparent !important;
+	}
+
+	/* ── Formulario inline bajo la tarjeta ── */
+	.bracket-result-form {
+	    width: 165px;
+	}
+
+	/* ── Conectores entre rondas (líneas en L) ── */
+	.bracket-round:not(:last-child) .bracket-match-wrapper::after {
+	    content: '';
+	    position: absolute;
+	    right: -20px;
+	    top: 50%;
+	    width: 20px;
+	    height: 1px;
+	    background: #4b5563;
+	}
+
+	/* Espaciado vertical automático según ronda:
+	   cada ronda doble el gap de la anterior */
+	.bracket-round:nth-child(1) .bracket-match-wrapper { padding: 6px 0; }
+	.bracket-round:nth-child(2) .bracket-match-wrapper { padding: 22px 0; }
+	.bracket-round:nth-child(3) .bracket-match-wrapper { padding: 54px 0; }
+	.bracket-round:nth-child(4) .bracket-match-wrapper { padding: 118px 0; }
+	.bracket-round:nth-child(5) .bracket-match-wrapper { padding: 246px 0; }
+
+	/* Separador horizontal entre rondas */
+	.bracket-round:not(:last-child) {
+	    margin-right: 30px;
+	    padding-right: 0;
+	    border-right: 1px solid #1e293b;
+	}
+	</style>
 </head>
 <body class="bg-dark text-white">
 
@@ -245,92 +401,107 @@
         </div>
 
         <!-- ── BRACKET ───────────────────────────────────────── -->
-        <div class="mt-5"
-             th:if="${tournament.status.name() == 'IN_PROGRESS' or tournament.status.name() == 'FINISHED'}">
-            <h5><i class="bi bi-diagram-3-fill text-warning"></i> Bracket</h5>
-            <hr class="border-light"/>
+		<div class="mt-5"
+		     th:if="${tournament.status.name() == 'IN_PROGRESS' or tournament.status.name() == 'FINISHED'}">
+		    <h5><i class="bi bi-diagram-3-fill text-warning"></i> Bracket</h5>
+		    <hr class="border-light"/>
 
-            <div th:if="${matches == null or matches.empty}" class="text-muted">
-                No hay partidos generados todavía.
-            </div>
+		    <div th:if="${matches == null or matches.empty}" class="text-muted">
+		        No hay partidos generados todavía.
+		    </div>
 
-            <!-- Agrupar por ronda -->
-            <div th:each="round : ${rounds}" class="mb-4">
-                <h6 class="text-warning">Ronda <span th:text="${round}"></span></h6>
-                <div class="row g-3">
-                    <div th:each="match : ${matches}"
-                         th:if="${match.round == round}"
-                         class="col-md-4">
-                        <div class="card bg-dark border-secondary p-3">
+		    <div th:if="${matches != null and !matches.empty}" class="bracket-scroll">
+		        <div class="bracket-container">
 
-                            <!-- INDIVIDUAL / DUO -->
-                            <div th:if="${tournament.modality.name() != 'TEAM'}">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span th:text="${match.player1 != null ? match.player1.username : 'BYE'}"
-                                          th:classappend="${match.winnerUser != null and match.winnerUser.id == match.player1?.id} ? 'text-success fw-bold' : ''">
-                                    </span>
-                                    <span class="text-muted small">vs</span>
-                                    <span th:text="${match.player2 != null ? match.player2.username : 'BYE'}"
-                                          th:classappend="${match.winnerUser != null and match.winnerUser.id == match.player2?.id} ? 'text-success fw-bold' : ''">
-                                    </span>
-                                </div>
-                                <!-- Selector ganador (solo organizador, partido pendiente) -->
-                                <form th:if="${isOrganizer and match.status.name() == 'PENDING'}"
-                                      th:action="@{/tournaments/{tid}/match/{mid}/result(tid=${tournament.id},mid=${match.id})}"
-                                      method="post" class="mt-2 d-flex gap-2">
-                                    <select name="winnerId" class="form-select form-select-sm" required>
-                                        <option value="">-- Ganador --</option>
-                                        <option th:if="${match.player1 != null}"
-                                                th:value="${match.player1.id}"
-                                                th:text="${match.player1.username}"></option>
-                                        <option th:if="${match.player2 != null}"
-                                                th:value="${match.player2.id}"
-                                                th:text="${match.player2.username}"></option>
-                                    </select>
-                                    <button class="btn btn-warning btn-sm">OK</button>
-                                </form>
-                                <span th:if="${match.status.name() == 'FINISHED'}"
-                                      class="badge bg-success mt-2">
-                                    Ganador: <span th:text="${match.winnerUser?.username}"></span>
-                                </span>
-                            </div>
+		            <!-- Una columna por ronda -->
+		            <div th:each="round : ${rounds}" class="bracket-round">
+		                <div class="bracket-round-title">
+		                    <span th:if="${roundStat.last and rounds.size() > 1}">🏆 Final</span>
+		                    <span th:unless="${roundStat.last and rounds.size() > 1}"
+		                          th:text="'Ronda ' + ${round}"></span>
+		                </div>
 
-                            <!-- TEAM -->
-                            <div th:if="${tournament.modality.name() == 'TEAM'}">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span th:text="${match.team1 != null ? match.team1.name : 'BYE'}"
-                                          th:classappend="${match.winnerTeam != null and match.winnerTeam.id == match.team1?.id} ? 'text-success fw-bold' : ''">
-                                    </span>
-                                    <span class="text-muted small">vs</span>
-                                    <span th:text="${match.team2 != null ? match.team2.name : 'BYE'}"
-                                          th:classappend="${match.winnerTeam != null and match.winnerTeam.id == match.team2?.id} ? 'text-success fw-bold' : ''">
-                                    </span>
-                                </div>
-                                <form th:if="${isOrganizer and match.status.name() == 'PENDING'}"
-                                      th:action="@{/tournaments/{tid}/match/{mid}/result(tid=${tournament.id},mid=${match.id})}"
-                                      method="post" class="mt-2 d-flex gap-2">
-                                    <select name="winnerId" class="form-select form-select-sm" required>
-                                        <option value="">-- Ganador --</option>
-                                        <option th:if="${match.team1 != null}"
-                                                th:value="${match.team1.id}"
-                                                th:text="${match.team1.name}"></option>
-                                        <option th:if="${match.team2 != null}"
-                                                th:value="${match.team2.id}"
-                                                th:text="${match.team2.name}"></option>
-                                    </select>
-                                    <button class="btn btn-warning btn-sm">OK</button>
-                                </form>
-                                <span th:if="${match.status.name() == 'FINISHED'}"
-                                      class="badge bg-success mt-2">
-                                    Ganador: <span th:text="${match.winnerTeam?.name}"></span>
-                                </span>
-                            </div>
+		                <!-- Matches de esta ronda -->
+		                <div class="bracket-match-list">
+		                    <div th:each="match : ${matches}"
+		                         th:if="${match.round == round}"
+		                         class="bracket-match-wrapper">
 
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+		                        <div th:class="${match.status.name() == 'FINISHED'} ? 'bracket-match finished' : 'bracket-match'">
+
+		                            <!-- INDIVIDUAL / DUO -->
+		                            <div th:if="${tournament.modality.name() != 'TEAM'}">
+		                                <div th:class="${match.winnerUser != null and match.player1 != null and match.winnerUser.id == match.player1.id} ? 'bracket-team winner' : 'bracket-team'">
+		                                    <i class="bi bi-person-fill"></i>
+		                                    <span th:text="${match.player1 != null ? match.player1.username : 'BYE'}"></span>
+		                                </div>
+		                                <div class="bracket-divider"></div>
+		                                <div th:class="${match.winnerUser != null and match.player2 != null and match.winnerUser.id == match.player2.id} ? 'bracket-team winner' : 'bracket-team'">
+		                                    <i class="bi bi-person-fill"></i>
+		                                    <span th:text="${match.player2 != null ? match.player2.username : 'BYE'}"></span>
+		                                </div>
+		                            </div>
+
+		                            <!-- TEAM -->
+		                            <div th:if="${tournament.modality.name() == 'TEAM'}">
+		                                <div th:class="${match.winnerTeam != null and match.team1 != null and match.winnerTeam.id == match.team1.id} ? 'bracket-team winner' : 'bracket-team'">
+		                                    <i class="bi bi-shield-fill"></i>
+		                                    <span th:text="${match.team1 != null ? match.team1.name : 'BYE'}"></span>
+		                                </div>
+		                                <div class="bracket-divider"></div>
+		                                <div th:class="${match.winnerTeam != null and match.team2 != null and match.winnerTeam.id == match.team2.id} ? 'bracket-team winner' : 'bracket-team'">
+		                                    <i class="bi bi-shield-fill"></i>
+		                                    <span th:text="${match.team2 != null ? match.team2.name : 'BYE'}"></span>
+		                                </div>
+		                            </div>
+		                        </div>
+
+		                        <!-- Botón ganador (solo organizador, solo PENDING) -->
+		                        <div th:if="${isOrganizer and match.status.name() == 'PENDING'}" class="bracket-result-form">
+		                            <form th:action="@{/tournaments/{tid}/match/{mid}/result(tid=${tournament.id},mid=${match.id})}"
+		                                  method="post" class="d-flex gap-1 mt-1">
+		                                <select name="winnerId" class="form-select form-select-sm" required>
+		                                    <option value="">Ganador</option>
+		                                    <!-- INDIVIDUAL / DUO -->
+		                                    <option th:if="${tournament.modality.name() != 'TEAM' and match.player1 != null}"
+		                                            th:value="${match.player1.id}"
+		                                            th:text="${match.player1.username}"></option>
+		                                    <option th:if="${tournament.modality.name() != 'TEAM' and match.player2 != null}"
+		                                            th:value="${match.player2.id}"
+		                                            th:text="${match.player2.username}"></option>
+		                                    <!-- TEAM -->
+		                                    <option th:if="${tournament.modality.name() == 'TEAM' and match.team1 != null}"
+		                                            th:value="${match.team1.id}"
+		                                            th:text="${match.team1.name}"></option>
+		                                    <option th:if="${tournament.modality.name() == 'TEAM' and match.team2 != null}"
+		                                            th:value="${match.team2.id}"
+		                                            th:text="${match.team2.name}"></option>
+		                                </select>
+		                                <button class="btn btn-warning btn-sm">✓</button>
+		                            </form>
+		                        </div>
+
+		                    </div>
+		                </div>
+		            </div>
+
+		            <!-- Campeón final -->
+		            <div class="bracket-round bracket-champion" th:if="${champion != null}">
+		                <div class="bracket-round-title">🥇 Campeón</div>
+		                <div class="bracket-match-list">
+		                    <div class="bracket-match-wrapper">
+		                        <div class="bracket-match finished champion-card">
+		                            <div class="bracket-team winner champion-team">
+		                                🏆 <span th:text="${champion}"></span>
+		                            </div>
+		                        </div>
+		                    </div>
+		                </div>
+		            </div>
+
+		        </div>
+		    </div>
+		</div>
 
     </div>
 </div>
