@@ -1,9 +1,13 @@
 package com.mikeldi.demo.service;
 
+import com.mikeldi.demo.dto.FriendDTO;
 import com.mikeldi.demo.entity.Friendship;
 import com.mikeldi.demo.entity.User;
 import com.mikeldi.demo.repository.FriendshipRepository;
 import com.mikeldi.demo.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,5 +62,21 @@ public class FriendshipService {
             .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
         if (!f.getReceiver().equals(user)) throw new RuntimeException("No autorizado");
         friendshipRepository.delete(f);
+    }
+    
+    // Eliminar amistad
+    @Transactional
+    public void remove(Long friendshipId) {
+        friendshipRepository.deleteById(friendshipId);
+    }
+    
+    public List<FriendDTO> getFriendDTOs(User user) {
+        return friendshipRepository.findAcceptedFriendships(user)
+            .stream()
+            .map(f -> {
+                User friend = f.getSender().equals(user) ? f.getReceiver() : f.getSender();
+                return new FriendDTO(f.getId(), friend.getUsername());
+            })
+            .toList();
     }
 }

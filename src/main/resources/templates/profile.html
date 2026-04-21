@@ -112,24 +112,31 @@
             </div>
         </div>
 
-        <!-- Mis amigos -->
-        <div class="col-md-12">
-            <div class="card bg-secondary p-3">
-                <h5><i class="bi bi-people-fill text-warning"></i> Mis amigos</h5>
-                <hr class="border-light"/>
-                <div th:if="${friends.empty}" class="text-muted small">
-                    No tienes amigos todavía.
-                    <a href="/friends" class="text-warning">Añadir amigos</a>
-                </div>
-                <div th:if="${!friends.empty}" class="d-flex flex-wrap gap-2">
-                    <span th:each="f : ${friends}"
-                          class="badge bg-dark border border-secondary text-white p-2">
-                        <i class="bi bi-person-circle text-warning me-1"></i>
-                        <span th:text="${f.username}"></span>
-                    </span>
-                </div>
-            </div>
-        </div>
+		<!-- Mis amigos -->
+		<div class="col-md-12">
+		    <div class="card bg-secondary p-3">
+		        <h5><i class="bi bi-people-fill text-warning"></i> Mis amigos</h5>
+		        <hr class="border-light"/>
+		        <div th:if="${friends.empty}" class="text-muted small">
+		            No tienes amigos todavía.
+		            <a href="/friends" class="text-warning">Añadir amigos</a>
+		        </div>
+		        <div th:if="${!friends.empty}" class="d-flex flex-wrap gap-2">
+		            <div th:each="f : ${friends}"
+		                 class="d-flex align-items-center gap-1 badge bg-dark border border-secondary text-white p-2">
+		                <i class="bi bi-person-circle text-warning me-1"></i>
+		                <span th:text="${f.username}"></span>
+						<form th:action="@{/friends/remove/{id}(id=${f.friendshipId})}" method="post" class="ms-1"
+						      onsubmit="return confirm('¿Eliminar a ' + this.dataset.username + ' de tus amigos?')"
+						      th:data-username="${f.username}">
+		                    <button class="btn btn-link text-danger p-0" style="font-size:0.75rem;">
+		                        <i class="bi bi-x-lg"></i>
+		                    </button>
+		                </form>
+		            </div>
+		        </div>
+		    </div>
+		</div>
 
     </div>
 </div>

@@ -1,5 +1,6 @@
 package com.mikeldi.demo.controller;
 
+import com.mikeldi.demo.dto.FriendDTO;
 import com.mikeldi.demo.entity.*;
 import com.mikeldi.demo.repository.UserRepository;
 import com.mikeldi.demo.service.*;
@@ -43,7 +44,7 @@ public class ProfileController {
         model.addAttribute("memberTeams", memberTeams);
 
         // Amigos
-        List<User> friends = friendshipService.getFriends(user);
+        List<FriendDTO> friends = friendshipService.getFriendDTOs(user);
         model.addAttribute("friends", friends);
 
         // Estadísticas básicas

@@ -57,23 +57,32 @@
         </ul>
     </div>
 
-    <!-- Lista de amigos -->
-    <div class="card bg-secondary p-3">
-        <h5><i class="bi bi-people-fill text-warning"></i>
-            Mis amigos
-            <span class="badge bg-secondary ms-1" th:text="${friends.size()}"></span>
-        </h5>
-        <div th:if="${friends.empty}" class="text-muted mt-2">
-            Aún no tienes amigos añadidos.
-        </div>
-        <ul class="list-group list-group-flush mt-2">
-            <li class="list-group-item bg-dark text-white"
-                th:each="f : ${friends}">
-                <i class="bi bi-person-circle text-warning"></i>
-                <span th:text="${f.username}"></span>
-            </li>
-        </ul>
-    </div>
+	<!-- Lista de amigos -->
+	<div class="card bg-secondary p-3">
+	    <h5><i class="bi bi-people-fill text-warning"></i>
+	        Mis amigos
+	        <span class="badge bg-secondary ms-1" th:text="${friends.size()}"></span>
+	    </h5>
+	    <div th:if="${friends.empty}" class="text-muted mt-2">
+	        Aún no tienes amigos añadidos.
+	    </div>
+	    <ul class="list-group list-group-flush mt-2">
+	        <li class="list-group-item bg-dark text-white d-flex justify-content-between align-items-center"
+	            th:each="f : ${friends}">
+	            <span>
+	                <i class="bi bi-person-circle text-warning"></i>
+	                <span th:text="${f.username}"></span>
+	            </span>
+				<form th:action="@{/friends/remove/{id}(id=${f.friendshipId})}" method="post"
+				      onsubmit="return confirm('¿Eliminar a ' + this.dataset.username + ' de tus amigos?')"
+				      th:data-username="${f.username}">
+	                <button class="btn btn-outline-danger btn-sm">
+	                    <i class="bi bi-person-x"></i>
+	                </button>
+	            </form>
+	        </li>
+	    </ul>
+	</div>
 
 </div>
 </body>

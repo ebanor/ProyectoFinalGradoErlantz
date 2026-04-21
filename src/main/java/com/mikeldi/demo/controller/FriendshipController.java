@@ -26,7 +26,7 @@ public class FriendshipController {
     @GetMapping
     public String friendsPage(Model model, Principal principal) {
         User user = getUser(principal);
-        model.addAttribute("friends", friendshipService.getFriends(user));
+        model.addAttribute("friends", friendshipService.getFriendDTOs(user));
         model.addAttribute("pending", friendshipService.getPendingReceived(user));
         return "friends/index";
     }
@@ -53,6 +53,13 @@ public class FriendshipController {
     @PostMapping("/reject/{id}")
     public String reject(@PathVariable Long id, Principal principal) {
         friendshipService.rejectRequest(id, getUser(principal));
+        return "redirect:/friends";
+    }
+    
+    @PostMapping("/remove/{id}")
+    public String removeFriend(@PathVariable Long id, RedirectAttributes ra) {
+        friendshipService.remove(id);
+        ra.addFlashAttribute("success", "Amigo eliminado.");
         return "redirect:/friends";
     }
 }
