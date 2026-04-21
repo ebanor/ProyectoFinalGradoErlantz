@@ -53,9 +53,17 @@
     <div class="card bg-secondary p-4 mb-5">
         <h5><i class="bi bi-people-fill text-warning"></i> Gestión de usuarios</h5>
         <hr class="border-light"/>
-        <div class="table-responsive">
+
+        <!-- Buscador -->
+        <div class="mb-3">
+            <input type="text" id="userSearch"
+                   class="form-control bg-dark text-white border-secondary"
+                   placeholder="🔍 Buscar por usuario, email o rol..."/>
+        </div>
+
+        <div style="max-height: 400px; overflow-y: auto;">
             <table class="table table-dark table-hover align-middle">
-                <thead class="text-warning">
+                <thead class="text-warning sticky-top" style="top: 0; z-index: 1;">
                     <tr>
                         <th>#</th>
                         <th>Usuario</th>
@@ -65,7 +73,7 @@
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="userTableBody">
                     <tr th:each="u : ${users}">
                         <td th:text="${u.id}"></td>
                         <td><i class="bi bi-person-circle text-warning me-1"></i><span th:text="${u.username}"></span></td>
@@ -100,62 +108,16 @@
         </div>
     </div>
 
-    <!-- Gestión de juegos -->
-    <div class="card bg-secondary p-4 mb-5">
-        <h5><i class="bi bi-controller text-warning"></i> Gestión de juegos</h5>
-        <hr class="border-light"/>
-
-        <!-- Añadir juego -->
-        <form th:action="@{/admin/games/new}" method="post" class="row g-2 mb-4">
-            <div class="col-md-4">
-                <input type="text" name="name" class="form-control form-control-sm bg-dark text-white border-secondary"
-                       placeholder="Nombre del juego" required/>
-            </div>
-            <div class="col-md-2">
-                <input type="number" name="playersPerTeam" class="form-control form-control-sm bg-dark text-white border-secondary"
-                       placeholder="Jugadores/equipo" min="0" value="0" required/>
-            </div>
-            <div class="col-md-2">
-                <input type="number" name="maxSubstitutesPerTeam" class="form-control form-control-sm bg-dark text-white border-secondary"
-                       placeholder="Suplentes máx." min="0" value="0" required/>
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-success btn-sm w-100">
-                    <i class="bi bi-plus-circle"></i> Añadir juego
-                </button>
-            </div>
-        </form>
-
-        <table class="table table-dark table-hover align-middle">
-            <thead class="text-warning">
-                <tr>
-                    <th>#</th>
-                    <th>Nombre</th>
-                    <th>Jugadores/equipo</th>
-                    <th>Suplentes máx.</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="g : ${games}">
-                    <td th:text="${g.id}"></td>
-                    <td><i class="bi bi-controller text-warning me-1"></i><span th:text="${g.name}"></span></td>
-                    <td th:text="${g.playersPerTeam}"></td>
-                    <td th:text="${g.maxSubstitutesPerTeam}"></td>
-                    <td>
-                        <form th:action="@{/admin/games/{id}/delete(id=${g.id})}" method="post"
-                              onsubmit="return confirm('¿Eliminar juego?')">
-                            <button class="btn btn-outline-danger btn-sm">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('userSearch').addEventListener('input', function () {
+        const filter = this.value.toLowerCase();
+        document.querySelectorAll('#userTableBody tr').forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(filter) ? '' : 'none';
+        });
+    });
+</script>
 </body>
 </html>
