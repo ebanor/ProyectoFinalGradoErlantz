@@ -31,7 +31,7 @@ services:
         condition: service_healthy
 
   app:
-    build: .
+    image: ghcr.io/ebanor/proyectofinalgradoerlantz:latest
     container_name: tournament-app
     depends_on:
       mysql:
