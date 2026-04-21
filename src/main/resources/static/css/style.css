@@ -1,0 +1,149 @@
+/* ── Fondo oscuro profundo ── */
+body {
+    background-color: #0b1120;
+    color: #e2e8f0;
+    min-height: 100vh;
+}
+
+/* ── Sobreescribe variables Bootstrap con tu paleta ── */
+:root {
+    --bs-body-bg: #0b1120;
+    --bs-body-color: #e2e8f0;
+    --bs-primary: #22c55e;
+    --bs-primary-rgb: 34, 197, 94;
+    --bs-success: #22c55e;
+    --bs-success-rgb: 34, 197, 94;
+    --bs-dark: #0b1120;
+    --bs-dark-rgb: 11, 17, 32;
+    --bs-secondary-bg: #172033;
+    --bs-border-color: rgba(255,255,255,.08);
+}
+
+/* ── Cards ── */
+.card {
+    background: #172033;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 16px;
+}
+
+/* ── Tablas ── */
+.table-dark {
+    --bs-table-bg: #111827;
+    --bs-table-hover-bg: rgba(34,197,94,.07);
+    --bs-table-border-color: rgba(255,255,255,.06);
+}
+
+/* ── Navbar ── */
+.navbar {
+    background: #0d1526 !important;
+    border-bottom: 1px solid rgba(34,197,94,.15);
+}
+
+/* ── Botones verdes ── */
+.btn-success, .btn-primary {
+    background: linear-gradient(180deg, #22c55e, #16a34a);
+    border: none;
+    font-weight: 600;
+    box-shadow: 0 6px 16px rgba(34,197,94,.22);
+}
+
+.btn-success:hover, .btn-primary:hover {
+    background: linear-gradient(180deg, #16a34a, #15803d);
+    transform: translateY(-1px);
+}
+
+/* ── Badges ── */
+.badge.bg-success { background: rgba(34,197,94,.18) !important; color: #86efac; border: 1px solid rgba(34,197,94,.25); }
+.badge.bg-warning { background: rgba(250,204,21,.18) !important; color: #fde68a; border: 1px solid rgba(250,204,21,.25); }
+.badge.bg-danger  { background: rgba(239,68,68,.18)  !important; color: #fca5a5; border: 1px solid rgba(239,68,68,.25); }
+.badge.bg-secondary { background: rgba(148,163,184,.14) !important; color: #cbd5e1; }
+.badge.bg-info    { background: rgba(56,189,248,.16)  !important; color: #7dd3fc; border: 1px solid rgba(56,189,248,.22); }
+
+/* ── Inputs ── */
+.form-control, .form-select {
+    background-color: #0f172a;
+    border: 1px solid rgba(255,255,255,.09);
+    color: #e2e8f0;
+    border-radius: 10px;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #0f172a;
+    color: #fff;
+    border-color: rgba(34,197,94,.55);
+    box-shadow: 0 0 0 .2rem rgba(34,197,94,.15);
+}
+
+/* ── Alerts ── */
+.alert-success {
+    background: rgba(34,197,94,.12);
+    color: #86efac;
+    border-color: rgba(34,197,94,.2);
+}
+
+.alert-danger {
+    background: rgba(239,68,68,.12);
+    color: #fca5a5;
+    border-color: rgba(239,68,68,.2);
+}
+
+/* ── Links ── */
+a { color: #4ade80; }
+a:hover { color: #86efac; }
+
+/* ── Text helpers ── */
+.text-warning { color: #facc15 !important; }
+.text-muted   { color: #64748b !important; }
+.bg-dark      { background-color: #111827 !important; }
+.bg-secondary { background-color: #172033 !important; }
+.border-secondary { border-color: rgba(255,255,255,.08) !important; }
+
+/* ── Cambiar amarillo → verde en iconos y títulos ── */
+.text-warning {
+    color: #22c55e !important;
+}
+
+.text-warning.fs-2,
+h4.text-warning,
+h5 .text-warning,
+h2.text-warning {
+    color: #22c55e !important;
+}
+
+/* ── Badges de rol ── */
+.badge.bg-warning {
+    background: rgba(34,197,94,.18) !important;
+    color: #86efac !important;
+    border: 1px solid rgba(34,197,94,.25) !important;
+}
+
+/* ── Botón OK (btn-warning en tabla) ── */
+.btn-warning {
+    background: linear-gradient(180deg, #22c55e, #16a34a) !important;
+    border: none !important;
+    color: #fff !important;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(34,197,94,.25);
+}
+
+.btn-warning:hover {
+    background: linear-gradient(180deg, #16a34a, #15803d) !important;
+    color: #fff !important;
+}
+
+/* ── Borde cards stats ── */
+.border-warning {
+    border-color: rgba(34,197,94,.35) !important;
+}
+
+/* ── Navbar trophy icon ── */
+.navbar .text-warning,
+.navbar-brand .text-warning {
+    color: #22c55e !important;
+}
+
+/* ── Cabecera tabla ── */
+thead.text-warning th,
+thead .text-warning {
+    color: #22c55e !important;
+}
