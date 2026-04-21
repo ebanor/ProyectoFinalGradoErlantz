@@ -75,7 +75,7 @@ public class FriendshipService {
             .stream()
             .map(f -> {
                 User friend = f.getSender().equals(user) ? f.getReceiver() : f.getSender();
-                return new FriendDTO(f.getId(), friend.getUsername());
+                return new FriendDTO(f.getId(), friend.getUsername(), friend.getAvatarUrl());
             })
             .toList();
     }

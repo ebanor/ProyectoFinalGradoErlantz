@@ -39,8 +39,13 @@
             <li class="list-group-item bg-dark text-white d-flex justify-content-between align-items-center"
                 th:each="f : ${pending}">
                 <span>
-                    <i class="bi bi-person-circle text-warning"></i>
-                    <span th:text="${f.sender.username}"></span>
+					<img th:src="${(f.sender.avatarUrl != null and !#strings.isEmpty(f.sender.avatarUrl))
+					               ? f.sender.avatarUrl
+					               : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + f.sender.username}"
+					     width="32" height="32"
+					     style="border-radius:50%; object-fit:cover; border:2px solid rgba(34,197,94,.4); background:#1a2a1a;"
+					     alt="Avatar"/>
+					<span th:text="${f.sender.username}" class="ms-1"></span>
                 </span>
                 <div class="d-flex gap-2">
                     <form th:action="@{/friends/accept/{id}(id=${f.id})}" method="post">
@@ -71,8 +76,13 @@
 	        <li class="list-group-item bg-dark text-white d-flex justify-content-between align-items-center"
 	            th:each="f : ${friends}">
 	            <span>
-	                <i class="bi bi-person-circle text-warning"></i>
-	                <span th:text="${f.username}"></span>
+					<img th:src="${(f.avatarUrl != null and !#strings.isEmpty(f.avatarUrl))
+					               ? f.avatarUrl
+					               : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + f.username}"
+					     width="32" height="32"
+					     style="border-radius:50%; object-fit:cover; border:2px solid rgba(34,197,94,.4); background:#1a2a1a;"
+					     alt="Avatar"/>
+					<span th:text="${f.username}" class="ms-1"></span>
 	            </span>
 				<form th:action="@{/friends/remove/{id}(id=${f.friendshipId})}" method="post"
 				      onsubmit="return confirm('¿Eliminar a ' + this.dataset.username + ' de tus amigos?')"

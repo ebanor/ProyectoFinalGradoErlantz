@@ -18,6 +18,9 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+    
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -42,6 +45,9 @@ public class User {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
+    public String getAvatarUrl() { return avatarUrl; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+    
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
 }

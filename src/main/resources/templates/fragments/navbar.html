@@ -38,10 +38,21 @@
 		    <i class="bi bi-gear-fill"></i> Admin
 		</a>
 
-        <a href="/profile" class="text-light small text-decoration-none">
-            <i class="bi bi-person-circle"></i>
-            <sec:authentication property="name" />
-        </a>
+		<!-- Avatar + username -->
+		<a href="/profile" class="text-decoration-none d-flex align-items-center gap-2" style="
+		    background:rgba(255,255,255,.05);
+		    border:1px solid rgba(255,255,255,.09);
+		    border-radius:10px;
+		    padding:.3rem .7rem;
+		    color:#e2e8f0;">
+		    <img th:src="${avatarUrl != null and !#strings.isEmpty(avatarUrl)}
+		                  ? ${avatarUrl}
+		                  : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + ${#authentication.name}"
+		         width="28" height="28"
+		         style="border-radius:50%; border:2px solid rgba(34,197,94,.5); background:#1a2a1a;"
+		         alt="Avatar"/>
+		    <span class="small" sec:authentication="name"></span>
+		</a>
 
         <form th:action="@{/logout}" method="post" class="m-0">
             <button type="submit" class="btn btn-outline-danger btn-sm">

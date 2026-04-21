@@ -32,4 +32,13 @@ public class UserService {
 
         return userRepository.save(user);
     }
+    
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    }
+
+    public User save(User user) {
+        return userRepository.save(user);
+    }
 }

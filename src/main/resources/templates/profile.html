@@ -5,18 +5,37 @@
     <title>Mi Perfil</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
-	<link th:href="@{/css/style.css}" rel="stylesheet"/>
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
 </head>
 <body class="bg-dark text-white">
 
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<div class="container mt-4">
+<div class="container mt-4 pb-5">
 
     <!-- Cabecera perfil -->
     <div class="card bg-secondary p-4 mb-4">
         <div class="d-flex align-items-center gap-3">
-            <i class="bi bi-person-circle text-warning" style="font-size: 4rem;"></i>
+
+            <!-- Avatar -->
+            <div style="position:relative; width:80px; height:80px; flex-shrink:0;">
+                <img id="profileAvatar"
+                     th:src="${(user.avatarUrl != null and !#strings.isEmpty(user.avatarUrl)) ? user.avatarUrl : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.username}"
+                     th:data-username="${user.username}"
+                     width="80" height="80"
+                     style="border-radius:50%; border:3px solid rgba(34,197,94,.5); background:#1a2a1a; object-fit:cover;"
+                     alt="Avatar"/>
+                <div data-bs-toggle="modal" data-bs-target="#avatarModal"
+                     style="position:absolute; bottom:0; right:0;
+                            width:26px; height:26px; border-radius:50%;
+                            background:#22c55e; border:2px solid #1a1a2e;
+                            display:flex; align-items:center; justify-content:center;
+                            cursor:pointer; font-size:.7rem; color:#fff;"
+                     title="Cambiar foto">
+                    <i class="bi bi-pencil-fill"></i>
+                </div>
+            </div>
+
             <div>
                 <h2 class="text-warning mb-0" th:text="${user.username}"></h2>
                 <span class="badge bg-dark text-warning border border-warning mt-1"
@@ -82,12 +101,10 @@
             <div class="card bg-secondary p-3 h-100">
                 <h5><i class="bi bi-shield-fill text-warning"></i> Mis equipos</h5>
                 <hr class="border-light"/>
-
                 <div th:if="${myTeams.empty and memberTeams.empty}" class="text-muted small">
                     No perteneces a ningún equipo.
                     <a href="/teams/new" class="text-warning">Crear equipo</a>
                 </div>
-
                 <ul class="list-group list-group-flush">
                     <li th:each="t : ${myTeams}"
                         class="list-group-item bg-dark text-white d-flex justify-content-between align-items-center">
@@ -113,34 +130,149 @@
             </div>
         </div>
 
-		<!-- Mis amigos -->
-		<div class="col-md-12">
-		    <div class="card bg-secondary p-3">
-		        <h5><i class="bi bi-people-fill text-warning"></i> Mis amigos</h5>
-		        <hr class="border-light"/>
-		        <div th:if="${friends.empty}" class="text-muted small">
-		            No tienes amigos todavía.
-		            <a href="/friends" class="text-warning">Añadir amigos</a>
-		        </div>
-		        <div th:if="${!friends.empty}" class="d-flex flex-wrap gap-2">
-		            <div th:each="f : ${friends}"
-		                 class="d-flex align-items-center gap-1 badge bg-dark border border-secondary text-white p-2">
-		                <i class="bi bi-person-circle text-warning me-1"></i>
-		                <span th:text="${f.username}"></span>
-						<form th:action="@{/friends/remove/{id}(id=${f.friendshipId})}" method="post" class="ms-1"
-						      onsubmit="return confirm('¿Eliminar a ' + this.dataset.username + ' de tus amigos?')"
-						      th:data-username="${f.username}">
-		                    <button class="btn btn-link text-danger p-0" style="font-size:0.75rem;">
-		                        <i class="bi bi-x-lg"></i>
-		                    </button>
-		                </form>
-		            </div>
-		        </div>
-		    </div>
-		</div>
+        <!-- Mis amigos -->
+        <div class="col-md-12">
+            <div class="card bg-secondary p-3">
+                <h5><i class="bi bi-people-fill text-warning"></i> Mis amigos</h5>
+                <hr class="border-light"/>
+                <div th:if="${friends.empty}" class="text-muted small">
+                    No tienes amigos todavía.
+                    <a href="/friends" class="text-warning">Añadir amigos</a>
+                </div>
+                <div th:if="${!friends.empty}" class="d-flex flex-wrap gap-2">
+                    <div th:each="f : ${friends}"
+                         class="d-flex align-items-center gap-1 badge bg-dark border border-secondary text-white p-2">
+                        <img th:src="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + ${f.username}"
+                             width="22" height="22"
+                             style="border-radius:50%; border:1px solid rgba(34,197,94,.3); background:#1a2a1a;"
+                             alt="Avatar"/>
+                        <span th:text="${f.username}"></span>
+                        <form th:action="@{/friends/remove/{id}(id=${f.friendshipId})}" method="post" class="ms-1"
+                              onsubmit="return confirm('¿Eliminar a ' + this.dataset.username + ' de tus amigos?')"
+                              th:data-username="${f.username}">
+                            <button class="btn btn-link text-danger p-0" style="font-size:0.75rem;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 </div>
+
+<!-- Modal cambiar avatar -->
+<div class="modal fade" id="avatarModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background:#111827; border:1px solid rgba(255,255,255,.08); border-radius:20px; color:#fff;">
+            <div class="modal-header" style="border-color:rgba(255,255,255,.08);">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-image text-success me-2"></i>Cambiar foto de perfil
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- FORM envuelve body + footer para que el file input esté dentro -->
+            <form th:action="@{/profile/avatar}" method="post" enctype="multipart/form-data" id="avatarForm">
+                <div class="modal-body">
+
+                    <!-- Avatares DiceBear -->
+                    <p style="color:#64748b; font-size:.85rem;" class="mb-2">Elige un estilo generado automáticamente:</p>
+                    <div class="d-flex flex-wrap gap-3 mb-4" id="avatarGrid"></div>
+                    <input type="hidden" name="avatarUrl" id="avatarUrlFinal" th:value="${user.avatarUrl}"/>
+
+                    <hr style="border-color:rgba(255,255,255,.08);"/>
+
+                    <!-- Subida de archivo -->
+                    <p style="color:#64748b; font-size:.85rem;" class="mb-2">O sube tu propia imagen desde el ordenador:</p>
+                    <label for="fileInput"
+                           style="display:flex; align-items:center; gap:.6rem; cursor:pointer;
+                                  background:#0f172a; border:1px dashed rgba(255,255,255,.2);
+                                  border-radius:10px; padding:.75rem 1rem; color:#94a3b8; font-size:.85rem;">
+                        <i class="bi bi-upload text-success fs-5"></i>
+                        <span id="fileLabel">Seleccionar archivo...</span>
+                    </label>
+                    <input type="file" id="fileInput" name="avatarFile" accept="image/*" style="display:none;"/>
+
+                    <!-- Vista previa -->
+                    <div id="previewWrap" class="mt-3 d-flex align-items-center gap-2" style="display:none;">
+                        <img id="urlPreview" width="56" height="56"
+                             style="border-radius:50%; border:2px solid rgba(34,197,94,.4); background:#1a2a1a; object-fit:cover;"
+                             alt="Preview"/>
+                        <span style="color:#86efac; font-size:.85rem;">Vista previa</span>
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="border-color:rgba(255,255,255,.08);">
+                    <button type="submit"
+                            style="background:linear-gradient(180deg,#22c55e,#16a34a); border:none; color:#fff;
+                                   font-weight:700; border-radius:10px; padding:.5rem 1.2rem;
+                                   box-shadow:0 6px 16px rgba(34,197,94,.25);">
+                        <i class="bi bi-check-circle me-1"></i>Guardar
+                    </button>
+                    <button type="button" data-bs-dismiss="modal"
+                            style="background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+                                   color:#94a3b8; border-radius:10px; padding:.5rem 1rem;">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const username    = document.getElementById('profileAvatar').getAttribute('data-username');
+    const styles      = ['avataaars','bottts','pixel-art','lorelei','identicon','micah','notionists','adventurer'];
+    const grid        = document.getElementById('avatarGrid');
+    const finalInput  = document.getElementById('avatarUrlFinal');
+    const fileInput   = document.getElementById('fileInput');
+    const previewWrap = document.getElementById('previewWrap');
+    const urlPreview  = document.getElementById('urlPreview');
+
+    // Genera los avatares DiceBear
+    styles.forEach(style => {
+        const url = `https://api.dicebear.com/7.x/${style}/svg?seed=${username}`;
+        const img = document.createElement('img');
+        img.src   = url;
+        img.title = style;
+        img.style.cssText = 'width:60px;height:60px;border-radius:50%;border:2px solid transparent;cursor:pointer;background:#1a2a1a;transition:border-color .18s;';
+        img.addEventListener('click', () => {
+            grid.querySelectorAll('img').forEach(i => i.style.borderColor = 'transparent');
+            img.style.borderColor = '#22c55e';
+            finalInput.value = url;
+            // Limpia el archivo seleccionado
+            fileInput.value = '';
+            document.getElementById('fileLabel').textContent = 'Seleccionar archivo...';
+            previewWrap.style.display = 'none';
+        });
+        grid.appendChild(img);
+    });
+
+    // Manejo del archivo subido
+    fileInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) return;
+
+        // Vista previa local
+        const reader = new FileReader();
+        reader.onload = e => {
+            urlPreview.src = e.target.result;
+            previewWrap.style.display = 'flex';
+        };
+        reader.readAsDataURL(file);
+
+        // Muestra el nombre del archivo en el label
+        document.getElementById('fileLabel').textContent = file.name;
+
+        // Limpia la selección de DiceBear (el archivo tiene prioridad)
+        grid.querySelectorAll('img').forEach(i => i.style.borderColor = 'transparent');
+        finalInput.value = '';
+    });
+</script>
 
 </body>
 </html>

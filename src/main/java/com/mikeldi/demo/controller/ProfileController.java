@@ -8,8 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.List;
 
@@ -22,6 +30,7 @@ public class ProfileController {
     @Autowired private TeamService teamService;
     @Autowired private FriendshipService friendshipService;
     @Autowired private BracketService bracketService;
+    @Autowired private UserService userService;
 
     @GetMapping
     public String profile(Principal principal, Model model) {
@@ -66,5 +75,32 @@ public class ProfileController {
         model.addAttribute("user", user);
 
         return "profile";
+    }
+    
+    @PostMapping("/avatar")
+    public String updateAvatar(
+            @RequestParam(required = false) String avatarUrl,
+            @RequestParam(required = false) MultipartFile avatarFile,
+            Principal principal,
+            RedirectAttributes ra) throws IOException {
+
+        User user = userRepository.findByUsername(principal.getName())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (avatarFile != null && !avatarFile.isEmpty()) {
+            String filename = principal.getName() + "_" + System.currentTimeMillis()
+                    + "_" + avatarFile.getOriginalFilename();
+            Path uploadDir = Paths.get("/app/uploads/avatars/");
+            Files.createDirectories(uploadDir);
+            avatarFile.transferTo(uploadDir.resolve(filename));
+            user.setAvatarUrl("/uploads/avatars/" + filename);
+
+        } else if (avatarUrl != null && !avatarUrl.isBlank()) {
+            user.setAvatarUrl(avatarUrl);
+        }
+
+        userRepository.save(user);
+        ra.addFlashAttribute("success", "Avatar actualizado correctamente");
+        return "redirect:/profile";
     }
 }
