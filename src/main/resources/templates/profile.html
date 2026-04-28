@@ -19,12 +19,14 @@
 
             <!-- Avatar -->
             <div style="position:relative; width:80px; height:80px; flex-shrink:0;">
-                <img id="profileAvatar"
-                     th:src="${(user.avatarUrl != null and !#strings.isEmpty(user.avatarUrl)) ? user.avatarUrl : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.username}"
-                     th:data-username="${user.username}"
-                     width="80" height="80"
-                     style="border-radius:50%; border:3px solid rgba(34,197,94,.5); background:#1a2a1a; object-fit:cover;"
-                     alt="Avatar"/>
+				<img id="profileAvatar"
+				     th:src="${(user.avatarUrl != null and !#strings.isEmpty(user.avatarUrl)) ? user.avatarUrl : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.username}"
+				     th:attr="data-fallback='https://api.dicebear.com/7.x/avataaars/svg?seed=' + ${user.username}"
+				     onerror="this.onerror=null; this.src=this.dataset.fallback;"
+				     th:data-username="${user.username}"
+				     width="80" height="80"
+				     style="border-radius:50%; border:3px solid rgba(34,197,94,.5); background:#1a2a1a; object-fit:cover;"
+				     alt="Avatar"/>
                 <div data-bs-toggle="modal" data-bs-target="#avatarModal"
                      style="position:absolute; bottom:0; right:0;
                             width:26px; height:26px; border-radius:50%;
@@ -142,10 +144,14 @@
                 <div th:if="${!friends.empty}" class="d-flex flex-wrap gap-2">
                     <div th:each="f : ${friends}"
                          class="d-flex align-items-center gap-1 badge bg-dark border border-secondary text-white p-2">
-                        <img th:src="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + ${f.username}"
-                             width="22" height="22"
-                             style="border-radius:50%; border:1px solid rgba(34,197,94,.3); background:#1a2a1a;"
-                             alt="Avatar"/>
+						 <img th:src="${(f.avatarUrl != null and !#strings.isEmpty(f.avatarUrl))
+						                ? f.avatarUrl
+						                : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + f.username}"
+						      th:attr="data-fallback='https://api.dicebear.com/7.x/avataaars/svg?seed=' + ${f.username}"
+						      onerror="this.onerror=null; this.src=this.dataset.fallback;"
+						      width="22" height="22"
+						      style="border-radius:50%; border:1px solid rgba(34,197,94,.3); background:#1a2a1a;"
+						      alt="Avatar"/>
                         <span th:text="${f.username}"></span>
                         <form th:action="@{/friends/remove/{id}(id=${f.friendshipId})}" method="post" class="ms-1"
                               onsubmit="return confirm('¿Eliminar a ' + this.dataset.username + ' de tus amigos?')"

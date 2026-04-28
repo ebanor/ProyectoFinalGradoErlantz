@@ -42,6 +42,8 @@
 					<img th:src="${(f.sender.avatarUrl != null and !#strings.isEmpty(f.sender.avatarUrl))
 					               ? f.sender.avatarUrl
 					               : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + f.sender.username}"
+					     th:attr="data-fallback='https://api.dicebear.com/7.x/avataaars/svg?seed=' + ${f.sender.username}"
+					     onerror="this.onerror=null; this.src=this.dataset.fallback;"
 					     width="32" height="32"
 					     style="border-radius:50%; object-fit:cover; border:2px solid rgba(34,197,94,.4); background:#1a2a1a;"
 					     alt="Avatar"/>
@@ -79,6 +81,8 @@
 					<img th:src="${(f.avatarUrl != null and !#strings.isEmpty(f.avatarUrl))
 					               ? f.avatarUrl
 					               : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + f.username}"
+					     th:attr="data-fallback='https://api.dicebear.com/7.x/avataaars/svg?seed=' + ${f.username}"
+					     onerror="this.onerror=null; this.src=this.dataset.fallback;"
 					     width="32" height="32"
 					     style="border-radius:50%; object-fit:cover; border:2px solid rgba(34,197,94,.4); background:#1a2a1a;"
 					     alt="Avatar"/>

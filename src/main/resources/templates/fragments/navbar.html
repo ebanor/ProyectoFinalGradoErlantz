@@ -45,12 +45,14 @@
 		    border-radius:10px;
 		    padding:.3rem .7rem;
 		    color:#e2e8f0;">
-		    <img th:src="${avatarUrl != null and !#strings.isEmpty(avatarUrl)}
-		                  ? ${avatarUrl}
-		                  : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + ${#authentication.name}"
-		         width="28" height="28"
-		         style="border-radius:50%; border:2px solid rgba(34,197,94,.5); background:#1a2a1a;"
-		         alt="Avatar"/>
+			<img th:src="${avatarUrl != null and !#strings.isEmpty(avatarUrl)}
+			              ? ${avatarUrl}
+			              : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + ${#authentication.name}"
+			     th:attr="data-fallback='https://api.dicebear.com/7.x/avataaars/svg?seed=' + ${#authentication.name}"
+			     onerror="this.onerror=null; this.src=this.dataset.fallback;"
+			     width="28" height="28"
+			     style="border-radius:50%; border:2px solid rgba(34,197,94,.5); background:#1a2a1a;"
+			     alt="Avatar"/>
 		    <span class="small" sec:authentication="name"></span>
 		</a>
 
